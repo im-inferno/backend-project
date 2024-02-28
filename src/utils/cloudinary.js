@@ -16,9 +16,9 @@ const uploadOnCloudinary = async (localFilePath) => {
     console.log("File has been uploded", response.url);
     return response;
   } catch (err) {
-    fs.unlinkSync(localFilePath);//Remove the Locally saved file as the operation has failed
-    return null
-}
+    fs.unlinkSync(localFilePath); //Remove the Locally saved file as the operation has failed
+    return null;
+  }
 };
 
-export {uploadOnCloudinary}
+export { uploadOnCloudinary };
