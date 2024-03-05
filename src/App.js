@@ -17,9 +17,9 @@ app.use(cookieParser());
 
 //import Router
 
-import { userRouter } from "./routes/user.router.js";
+import { router } from "./routes/user.router.js";
 
-app.use("/api/v1/users", userRouter);
+app.use("/api/v1/users", router);
 //https:localhost:8000/api/v1/users
 
 export { app };
