@@ -4,6 +4,17 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiRes.js";
 
+const generateAccessAndRefreshToken = async(userId)=>{
+  const user = await User.findById(userId)
+  const accessToken = user.generateAccessToken()
+  const refreshToken = user.generateRefreshToken()
+  
+  user.refreshToken = refreshToken;
+  await user.save({validateBeforeSave:false})
+
+  return {accessToken,refreshToken}
+}
+
 const registerUser = asyncHandler(async (req, res) => {
 
 
@@ -106,14 +117,18 @@ const loginUser = asyncHandler(async(req,res)=>{
     throw new ApiError(404,"User not found")
   }
   
-  
+
   //Validate the password
 
   const isPasswordValid = await user.isPasswordCorrect(password)
+
   if(!isPasswordValid){
     throw new ApiError(401,"Inavalid credentials")
   }
 
+  //Generate access and refresh tokens
 
+  const {refreshToken,accessToken } = await generateAccessAndRefreshToken(user._id)
+  
 })
 export { registerUser };
