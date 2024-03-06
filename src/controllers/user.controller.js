@@ -19,6 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //Get the data from the client
 
   const { fullName, userName, email, password } = req.body;
+  console.log(email)
   res.status(200);
 
   //validation (whether the field is empty or not ....)
@@ -92,11 +93,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   //Take the data from the request
-  const { password, email, userName } = req.body;
+   const {userName, email, password } = req.body;
+
 
   //userName or email based login
 
-  if (!userName || !email) {
+  if (!(userName || email)) {
     throw new ApiError(400, "Username or email required");
   }
 
