@@ -181,40 +181,45 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   if (!incommingRefreshToken) {
     throw new ApiError(401, "Unauthorized request");
   }
-  const decodedRefreshToken = jwt.verify(
-    incommingRefreshToken,
-    process.env.REFRESH_TOKEN_SECRET
-  );
-
-  const user = await User.findById(decodedRefreshToken?._id);
-
-  if (!user) {
-    throw new ApiError(401, "Invalid refresh Token");
-  }
-
-  const { accessToken, newRefreshToken } = generateAccessAndRefreshToken(
-    user._id
-  );
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-  if (incommingRefreshToken !== user?.refreshToken) {
-    throw new ApiError(401, "Refresh Token expired");
-  }
-  res
-    .status(200)
-    .cookies("accessToken", accessToken, options)
-    .cookies("refreshToken", newRefreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          accessToken,
-          refreshToken: newRefreshToken,
-        },
-        "The token has been refreshed"
-      )
+  try {
+    const decodedRefreshToken = jwt.verify(
+      incommingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
     );
+  
+    const user = await User.findById(decodedRefreshToken?._id);
+  
+    if (!user) {
+      throw new ApiError(401, "Invalid refresh Token");
+    }
+  
+    const { accessToken, newRefreshToken } = generateAccessAndRefreshToken(
+      user._id
+    );
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+    if (incommingRefreshToken !== user?.refreshToken) {
+      throw new ApiError(401, "Refresh Token expired");
+    }
+    res
+      .status(200)
+      .cookies("accessToken", accessToken, options)
+      .cookies("refreshToken", newRefreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            accessToken,
+            refreshToken: newRefreshToken,
+          },
+          "The token has been refreshed"
+        )
+      );
+  } catch (error) {
+    throw new ApiError(401,error?.message || "Invalid refresh token")
+    
+  }
 });
 export { registerUser, loginUser, logoutUser, refreshAccessToken };
